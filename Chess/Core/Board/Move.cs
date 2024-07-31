@@ -32,6 +32,21 @@ public class Move: IEquatable<Move>
 	public MoveFlag Flag => (MoveFlag)((_move & FlagMask)>>12);
 	public bool IsPromotion => Flag >= MoveFlag.PromoteToQueenFlag;
 	public bool IsCastle => Flag == MoveFlag.CastleFlag;
+	public PieceType PromotionPieceType
+	{
+		get
+		{
+			if (!IsPromotion) throw new InvalidOperationException("Move is not a promotion move");
+			return Flag switch
+			{
+				MoveFlag.PromoteToQueenFlag => PieceType.Queen,
+				MoveFlag.PromoteToKnightFlag => PieceType.Knight,
+				MoveFlag.PromoteToRookFlag => PieceType.Rook,
+				MoveFlag.PromoteToBishopFlag => PieceType.Bishop,
+				_ => throw new InvalidOperationException("Invalid promotion flag")
+			};
+		}
+	}
 
 	public virtual bool Equals(Move? move) => _move == move?._move;
 	public override bool Equals(object? obj) => Equals(obj as Move);
@@ -46,4 +61,5 @@ public class Move: IEquatable<Move>
 	}
 
 	public static bool operator !=(Move? a, Move? b) => !(a == b);
+
 }
