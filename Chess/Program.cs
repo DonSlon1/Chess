@@ -3,6 +3,7 @@
 using Chess.Core.Board;
 using Chess.Core.Helpers;
 
+/*
 Console.WriteLine("Black king");
 var black = Piece.MakePiece(PieceType.King, PieceColor.Black);
 Console.WriteLine(Piece.GetColor(black));
@@ -21,3 +22,9 @@ var fen = "Knbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 var board = new Board(fen);
 Console.WriteLine(BoardUtility.NameFromIndex(board.epFile));
 Console.WriteLine(board.ToString());
+*/
+
+var move = new Move(8,17,MoveFlag.CastleFlag);
+Console.WriteLine(move.StartSquare);
+Console.WriteLine(move.TargetSquare);
+Console.WriteLine(move.Flag);
