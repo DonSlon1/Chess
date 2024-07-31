@@ -13,7 +13,7 @@ public enum MoveFlag
 	PromoteToBishopFlag = 0b0111,
 }
 
-public class Move
+public class Move: IEquatable<Move>
 {
     private readonly ushort _move;
 
@@ -33,4 +33,17 @@ public class Move
 	public bool IsPromotion => Flag >= MoveFlag.PromoteToQueenFlag;
 	public bool IsCastle => Flag == MoveFlag.CastleFlag;
 
+	public virtual bool Equals(Move? move) => _move == move?._move;
+	public override bool Equals(object? obj) => Equals(obj as Move);
+
+	public override int GetHashCode() => _move.GetHashCode();
+
+	public static bool operator ==(Move? a, Move? b)
+	{
+		if (ReferenceEquals(a, b)) return true;
+        if (a is null || b is null) return false;
+		return a.Equals(b);
+	}
+
+	public static bool operator !=(Move? a, Move? b) => !(a == b);
 }
