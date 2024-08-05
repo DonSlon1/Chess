@@ -24,6 +24,18 @@ public static class Piece
 {
 
     public const byte WhiteKing = (byte)King | (byte)White;
+    public const byte WhiteQueen = (byte)Queen | (byte)White;
+    public const byte WhiteRook = (byte)Rook | (byte)White;
+    public const byte WhiteBishop = (byte)Bishop | (byte)White;
+    public const byte WhiteKnight = (byte)Knight | (byte)White;
+    public const byte WhitePawn = (byte)Pawn | (byte)White;
+    public const byte BlackKing = (byte)King | (byte)Black;
+    public const byte BlackQueen = (byte)Queen | (byte)Black;
+    public const byte BlackRook = (byte)Rook | (byte)Black;
+    public const byte BlackBishop = (byte)Bishop | (byte)Black;
+    public const byte BlackKnight = (byte)Knight | (byte)Black;
+    public const byte BlackPawn = (byte)Pawn | (byte)Black;
+
     private const byte ColorMask = 0b1000;
     private const byte PieceMask = 0b0111;
 
