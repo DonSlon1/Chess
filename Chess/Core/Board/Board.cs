@@ -6,9 +6,9 @@ namespace Chess.Core.Board;
 public class Board
 {
     private const string StartFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    private readonly int[] _squares;
+    private readonly byte[] _squares;
 
-    public int[] Squares
+    public byte[] Squares
     {
         get => _squares;
         init
@@ -44,11 +44,12 @@ public class Board
     public Board(): this(StartFen)
     {
     }
+    public bool IsWhiteSquare(int squareIndex) => (squareIndex / 8 + squareIndex % 8) % 2 == 0;
 
     public Board(string fen)
     {
         _fen = fen;
-        _squares = new int[64];
+        _squares = new byte[64];
         var posInfo = new FenUtility.PositionInfo(fen);
         posInfo.squaers.CopyTo(Squares,0);
         isWhiteToMove = posInfo.isWhiteToMove;
@@ -65,5 +66,12 @@ public class Board
     public override string ToString()
     {
         return BoardUtility.CreateDiagram(this);
+    }
+
+    public void MakeMove(Move move)
+    {
+        _squares[move.TargetSquare] = _squares[move.StartSquare];
+        _squares[move.StartSquare] = (byte)PieceType.None;
+        AllGameMoves.Add(move);
     }
 }

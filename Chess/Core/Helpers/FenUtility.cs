@@ -10,7 +10,7 @@ public class FenUtility
     public readonly struct PositionInfo
     {
         public readonly string fen;
-        public readonly int[] squaers;
+        public readonly byte[] squaers;
         public readonly bool isWhiteToMove;
 
         // Castling rights
@@ -27,7 +27,7 @@ public class FenUtility
         public PositionInfo(string fen)
         {
             this.fen = fen;
-            int[] squarePieces = new int[64];
+            byte[] squarePieces = new byte[64];
             string[] sections = fen.Split(' ');
 
             int file = 0;
@@ -91,7 +91,7 @@ public class FenUtility
         return fen.ToString();
     }
 
-    private static string CurrentFenFields(int[] squares)
+    private static string CurrentFenFields(byte[] squares)
     {
         var fen = new StringBuilder();
         for (int i = 8 - 1; i >= 0; i--)

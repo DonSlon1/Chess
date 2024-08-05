@@ -22,11 +22,13 @@ public enum PieceColor
 
 public static class Piece
 {
-    private const int ColorMask = 0b1000;
-    private const int PieceMask = 0b0111;
 
-    public static int MakePiece(PieceType pieceType, PieceColor pieceColor) => (int) pieceType | (int) pieceColor;
-    public static int MakePiece(PieceType pieceType,bool isWhite) => MakePiece(pieceType, isWhite ? White : Black);
+    public const byte WhiteKing = (byte)King | (byte)White;
+    private const byte ColorMask = 0b1000;
+    private const byte PieceMask = 0b0111;
+
+    public static byte MakePiece(PieceType pieceType, PieceColor pieceColor) => (byte) ((byte) pieceType | (byte) pieceColor);
+    public static byte MakePiece(PieceType pieceType,bool isWhite) => MakePiece(pieceType, isWhite ? White : Black);
     public static PieceColor GetColor(int piece) => (PieceColor) (ColorMask & piece);
     public static PieceType GetType(int piece) => (PieceType) (PieceMask & piece);
 
@@ -45,7 +47,7 @@ public static class Piece
         return GetColor(piece) == White ? pieceSymbol : char.ToLower(pieceSymbol);
     }
 
-    public static int GetPieceFromSymbol(char symbol)
+    public static byte GetPieceFromSymbol(char symbol)
     {
         var pieceSymbol = char.ToUpper(symbol);
         var pieceType = pieceSymbol switch
