@@ -10,19 +10,20 @@ public class PGNUtitlity
         throw new NotImplementedException();
     }
 
-    public static List<Move> ParsePGN(string pgn)
+    public static Board ParsePGN(string pgn)
     {
+        Board board = new();
         string[] movesLines = Regex.Split(pgn, @"\d+\.");
         foreach (var movesLine in movesLines)
         {
             var moves = movesLine.Trim().Split(" ");
             foreach (var move in moves)
             {
-                MoveUtility.GetMoveFromSAN(move);
+                board.MakeMove(MoveUtility.GetMoveFromSAN(move));
             }
         }
 
-        return new List<Move>();
+        return board;
     }
 
 }
