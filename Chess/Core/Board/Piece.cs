@@ -44,7 +44,7 @@ public static class Piece
     public static PieceColor GetColor(int piece) => (PieceColor) (ColorMask & piece);
     public static PieceType GetType(int piece) => (PieceType) (PieceMask & piece);
 
-    public static char GetPieceSymbol(int piece)
+    public static char GetPieceSymbol(byte piece)
     {
         var pieceSymbol = GetType(piece) switch
         {

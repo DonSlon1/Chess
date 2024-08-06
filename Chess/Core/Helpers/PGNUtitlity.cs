@@ -19,7 +19,10 @@ public class PGNUtitlity
             var moves = movesLine.Trim().Split(" ");
             foreach (var move in moves)
             {
-                board.MakeMove(MoveUtility.GetMoveFromSAN(move));
+                if (move == "") continue;
+
+                board.MakeMove(MoveUtility.GetMoveFromSAN(move, board));
+                Console.WriteLine(board.ToString());
             }
         }
 

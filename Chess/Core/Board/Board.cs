@@ -25,7 +25,7 @@ public class Board
         init => _fen = value ?? throw new ArgumentNullException(nameof(value));
     }
 
-    public readonly bool isWhiteToMove;
+    public bool isWhiteToMove;
 
     // Castling rights
     public readonly bool whiteCastleKingside;
@@ -72,6 +72,7 @@ public class Board
     {
         _squares[move.TargetSquare] = _squares[move.StartSquare];
         _squares[move.StartSquare] = (byte)PieceType.None;
+        isWhiteToMove = !isWhiteToMove;
         AllGameMoves.Add(move);
     }
 }

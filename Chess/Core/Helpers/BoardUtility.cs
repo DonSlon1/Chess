@@ -8,7 +8,7 @@ public class BoardUtility
 	public const string fileNames = "abcdefgh";
 	public const string rankNames = "12345678";
 
-	public static int IndexFromName(string name)
+	public static byte IndexFromName(string name)
 	{
 		if (name.Length != 2) throw new ArgumentException("Invalid field name");
 		name = name.ToLower();
@@ -17,7 +17,7 @@ public class BoardUtility
 		if (!fileNames.Contains(fileName)) throw new ArgumentException("Invalid file name");
 		if (!rankNames.Contains(rankName)) throw new ArgumentException("Invalid rank name");
 
-		return fileNames.IndexOf(fileName) * 8 + rankNames.IndexOf(rankName);
+		return (byte)(rankNames.IndexOf(rankName) * 8 + fileNames.IndexOf(fileName));
 	}
 
 	public static string CreateDiagram(Board.Board board, bool blackAtTop = true, bool includeFen = true, bool includeZobristKey = true)
@@ -36,7 +36,7 @@ public class BoardUtility
 				int fileIndex = blackAtTop ? x : 7 - x;
 				int squareIndex = IndexFromCoord(fileIndex, rankIndex);
 				//bool highlight = squareIndex == lastMoveSquare;
-				int piece = board.Squares[squareIndex];
+				byte piece = board.Squares[squareIndex];
 				// if (highlight)
 				// {
 				// 	result.Append($"|({Piece.GetPieceSymbol(piece)})");
@@ -89,5 +89,13 @@ public class BoardUtility
 	public static string NameFromCoord(int fileIndex, int rankIndex)
 	{
 		return $"{fileNames[fileIndex]}{rankNames[rankIndex]}";
+	}
+	public static byte GetRank(byte squareIndex)
+	{
+		return (byte)(squareIndex / 8);
+	}
+	public static byte GetFile(byte squareIndex)
+	{
+		return (byte)(squareIndex % 8);
 	}
 }
