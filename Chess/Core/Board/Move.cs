@@ -7,6 +7,7 @@ public enum MoveFlag
 	CastleFlag = 0b0010,
 	CheckFlag = 0b1000,
 	PawnTwoUpFlag = 0b0011,
+	CaptureFlag = 0b0110,
 
 	PromoteToQueenFlag = 0b1100,
 	PromoteToKnightFlag = 0b1101,

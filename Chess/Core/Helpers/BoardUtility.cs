@@ -84,7 +84,7 @@ public class BoardUtility
 	public static string NameFromIndex(int? index)
 	{
 		if (index == null) return "-";
-		return $"{fileNames[index.Value / 8]}{rankNames[index.Value % 8]}";
+		return $"{fileNames[index.Value % 8]}{rankNames[index.Value / 8]}";
 	}
 	public static string NameFromCoord(int fileIndex, int rankIndex)
 	{

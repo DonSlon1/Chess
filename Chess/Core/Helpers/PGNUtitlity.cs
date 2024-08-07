@@ -20,9 +20,12 @@ public class PGNUtitlity
             foreach (var move in moves)
             {
                 if (move == "") continue;
-
-                board.MakeMove(MoveUtility.GetMoveFromSAN(move, board));
-                Console.WriteLine(board.ToString());
+                var newMove = MoveUtility.GetMoveFromSAN(move, board);
+                if (newMove != null)
+                {
+                    board.MakeMove(newMove);
+                    Console.WriteLine(board.ToString());
+                }
             }
         }
 
