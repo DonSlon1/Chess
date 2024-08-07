@@ -2,11 +2,17 @@ using Chess.Core.Board;
 
 namespace Chess.Core.Helpers;
 
-public class MoveUtility
+public static class MoveUtility
 {
+    public static readonly sbyte[] KingMoves = { -9, -8, -7, -1, 1, 7, 8, 9 };
+    public static readonly sbyte[] KnightMoves = { -17, -15, -10, -6, 6, 10, 15, 17 };
+    public static readonly sbyte[] DiagonalMoves = { -9, -7, 7, 9 };
+    public static readonly sbyte[] StraightMoves = { -8, -1, 1, 8 };
+
     public static string GetSANFromMove(Move move)
     {
 	    var s = $"Move from {move.StartSquare} to {move.TargetSquare}";
+        Console.WriteLine(s);
         throw new NotImplementedException();
     }
 
@@ -18,19 +24,9 @@ public class MoveUtility
     {
         san = san.Replace("+", "").Replace("#", ""); // Remove check and checkmate symbols
 
-        if (san == "O-O")
+        if (san == "O-O" || san == "O-O-O")
         {
-            // Kingside castling
-            return board.isWhiteToMove
-                ? new Move(4, 6, MoveFlag.CastleFlag, Piece.WhiteKing)
-                : new Move(60, 62, MoveFlag.CastleFlag, Piece.BlackKing);
-        }
-        if (san == "O-O-O")
-        {
-            // Queenside castling
-            return board.isWhiteToMove
-                ? new Move(4, 2, MoveFlag.CastleFlag, Piece.WhiteKing)
-                : new Move(60, 58, MoveFlag.CastleFlag, Piece.BlackKing);
+            return CreateCastleMove(san, board.isWhiteToMove);
         }
 
         if (san == "0-1")
@@ -49,7 +45,7 @@ public class MoveUtility
 
         byte targetSquare = BoardUtility.IndexFromName(san.Substring(san.Length - 2));
         byte piece = board.isWhiteToMove ? Piece.WhitePawn : Piece.BlackPawn;
-        char pieceChar = ' ';
+        char pieceChar;
 
         if (char.IsUpper(san[0]))
         {
@@ -97,15 +93,29 @@ public class MoveUtility
 
         return new Move(startingSquare, targetSquare, flag, piece);
     }
+    private static Move? CreateCastleMove(string san,bool isWhithToMove)
+    {
+        if (san == "O-O")
+        {
+            // Kingside castling
+            return isWhithToMove
+                ? new Move(4, 6, MoveFlag.CastleFlag, Piece.WhiteKing)
+                : new Move(60, 62, MoveFlag.CastleFlag, Piece.BlackKing);
+        }
+        if (san == "O-O-O")
+        {
+            // Queenside castling
+            return isWhithToMove
+                ? new Move(4, 2, MoveFlag.CastleFlag, Piece.WhiteKing)
+                : new Move(60, 58, MoveFlag.CastleFlag, Piece.BlackKing);
+        }
+        return null;
+    }
 
     private static IEnumerable<byte> GetPossibleStartingSquares(byte piece, byte targetSquare, byte[] squares)
     {
         for (byte i = 0; i < 64; i++)
         {
-            if (squares[i] == piece)
-            {
-
-            }
             if (squares[i] == piece && IsValidMove(Piece.GetType(piece), Piece.GetColor(piece), i, targetSquare, squares))
             {
                 yield return i;
@@ -148,19 +158,18 @@ public class MoveUtility
 
         // Check two squares behind (for initial double move)
         byte twoSquaresBehind = (byte)((rank - 2 * direction) * 8 + file);
-        if (IsValidSquare(twoSquaresBehind) && squares[twoSquaresBehind] == piece)
+        if (IsValidSquare(twoSquaresBehind) &&
+            squares[twoSquaresBehind] == piece &&
+            ((color == PieceColor.White && rank == 3) || (color == PieceColor.Black && rank == 4)))
         {
             // Ensure it's a valid double move (pawn on its starting rank)
-            if ((color == PieceColor.White && rank == 3) || (color == PieceColor.Black && rank == 4))
-            {
-                return twoSquaresBehind;
-            }
+            return twoSquaresBehind;
         }
 
         // Check diagonal captures
         for (int fileOffset = -1; fileOffset <= 1; fileOffset += 2)
         {
-            byte captureSquare = (byte)((rank - direction) * 8 + (file + fileOffset));
+            byte captureSquare = (byte)((rank - direction) * 8 + file + fileOffset);
             if (IsValidSquare(captureSquare) && squares[captureSquare] == piece)
             {
                 return captureSquare;
@@ -172,19 +181,17 @@ public class MoveUtility
 
     private static byte FindPieceOnDiagonals(byte piece, byte targetSquare, byte[] squares)
     {
-        int[] directions = { -9, -7, 7, 9 };
-        return FindPieceInDirections(piece, targetSquare, squares, directions);
+        return FindPieceInDirections(piece, targetSquare, squares, DiagonalMoves);
     }
 
     private static byte FindPieceOnStraightLines(byte piece, byte targetSquare, byte[] squares)
     {
-        int[] directions = { -8, -1, 1, 8 };
-        return FindPieceInDirections(piece, targetSquare, squares, directions);
+        return FindPieceInDirections(piece, targetSquare, squares, StraightMoves);
     }
 
-    private static byte FindPieceInDirections(byte piece, byte targetSquare, byte[] squares, int[] directions)
+    private static byte FindPieceInDirections(byte piece, byte targetSquare, byte[] squares, sbyte[] directions)
     {
-        foreach (int direction in directions)
+        foreach (sbyte direction in directions)
         {
             int currentSquare = targetSquare;
             while (true)
@@ -201,34 +208,26 @@ public class MoveUtility
 
     private static byte FindKnight(byte piece, byte targetSquare, byte[] squares)
     {
-        int[] knightMoves = { -17, -15, -10, -6, 6, 10, 15, 17 };
-        foreach (int move in knightMoves)
+        foreach (var move in KnightMoves)
         {
             int currentSquare = targetSquare + move;
-            if (IsValidSquare((byte)currentSquare))
-            {
-                if (Math.Abs(BoardUtility.GetFile((byte)currentSquare) - BoardUtility.GetFile(targetSquare)) <= 2)
-                {
-                    if (squares[currentSquare] == piece) return (byte)currentSquare;
-                }
-            }
+            if (IsValidSquare((byte)currentSquare) &&
+                Math.Abs(BoardUtility.GetFile((byte)currentSquare) - BoardUtility.GetFile(targetSquare)) <= 2 &&
+                squares[currentSquare] == piece)
+                return (byte)currentSquare;
         }
         return 255; // Not found
     }
 
     private static byte FindKing(byte piece, byte targetSquare, byte[] squares)
     {
-        int[] kingMoves = { -9, -8, -7, -1, 1, 7, 8, 9 };
-        foreach (int move in kingMoves)
+        foreach (var move in KingMoves)
         {
             int currentSquare = targetSquare + move;
-            if (IsValidSquare((byte)currentSquare))
-            {
-                if (Math.Abs(BoardUtility.GetFile((byte)currentSquare) - BoardUtility.GetFile(targetSquare)) <= 1)
-                {
-                    if (squares[currentSquare] == piece) return (byte)currentSquare;
-                }
-            }
+            if (IsValidSquare((byte)currentSquare) &&
+                Math.Abs(BoardUtility.GetFile((byte)currentSquare) - BoardUtility.GetFile(targetSquare)) <= 1 &&
+                squares[currentSquare] == piece)
+                return (byte)currentSquare;
         }
         return 255; // Not found
     }
