@@ -38,6 +38,10 @@ public class Board
     public readonly int fityMovePlayCount;
     public readonly int moveCount;
 
+    //Game state
+    public bool GameOver { get; set; }
+    public bool WhiteWon { get; set; }
+
     //Moves
     public List<Move> AllGameMoves { get; } = new();
 

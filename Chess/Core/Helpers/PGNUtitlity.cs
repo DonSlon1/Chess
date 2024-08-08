@@ -6,21 +6,25 @@ namespace Chess.Core.Helpers;
 using Chess.Core.Board;
 public class PGNUtitlity
 {
-    public static string CreatePGN(Board board)
+    public static string CreatePGN(Board originalBoard)
     {
+        Move[] moves = originalBoard.AllGameMoves.ToArray();
         StringBuilder sb = new();
-        for (int i = 0; i < board.AllGameMoves.Count; i++)
+        Board board = new();
+        for (int i = 0; i < moves.Length; i++)
         {
             if (i%2 == 0)
             {
-                sb.Append($" {i/2 + 1}. ");
-                sb.Append(MoveUtility.GetSANFromMove(board.AllGameMoves[i]));
-                sb.Append(" ");
-                if (board.AllGameMoves[i+1] != null)
-                {
-                    sb.Append(MoveUtility.GetSANFromMove(board.AllGameMoves[i+1]));
-                }
+                sb.Append($"{i/2 + 1}. ");
             }
+            sb.Append(MoveUtility.GetSANFromMove(moves[i],board));
+            sb.Append(" ");
+            board.MakeMove(moves[i]);
+        }
+
+        if (originalBoard.GameOver)
+        {
+            sb.Append(originalBoard.WhiteWon ? "1-0" : "0-1");
         }
         return sb.ToString();
     }
@@ -35,10 +39,22 @@ public class PGNUtitlity
             {
                 if (move == "") continue;
                 var newMove = MoveUtility.GetMoveFromSAN(move, board);
-                if (newMove != null)
+                if (newMove is not null)
                 {
                     board.MakeMove(newMove);
-                    //Console.WriteLine(board.ToString());
+                }
+                else
+                {
+                    if (move == "0-1")
+                    {
+                        board.GameOver = true;
+                        board.WhiteWon = false;
+                    }
+                    else if (move == "1-0")
+                    {
+                        board.GameOver = true;
+                        board.WhiteWon = true;
+                    }
                 }
             }
         }

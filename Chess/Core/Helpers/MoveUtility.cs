@@ -9,22 +9,23 @@ public static class MoveUtility
     public static readonly sbyte[] DiagonalMoves = { -9, -7, 7, 9 };
     public static readonly sbyte[] StraightMoves = { -8, -1, 1, 8 };
 
-    public static string GetSANFromMove(Move move)
+    public static string GetSANFromMove(Move move,Board.Board board)
     {
-        var piece = Piece.GetPieceSymbol(move.Piece);
+        var piece = char.ToUpper(Piece.GetPieceSymbol(move.Piece));
         var targetSquare = BoardUtility.NameFromIndex(move.TargetSquare);
         var startSquare = BoardUtility.NameFromIndex(move.StartSquare);
         var flag = move.Flag;
         var isCapture = MoveFlag.CaptureFlag == flag;
         var isCheck = move.IsCheck ? "+" : "";
         var isCheckmate = move.IsCheckMate ? "#" : "";
+        var isPossibleMoreMoves = move.PossibleMoreStartingSquares;
 
         if (flag == MoveFlag.CastleFlag)
         {
             return move.TargetSquare == 6 ? "O-O" : "O-O-O";
         }
 
-        if (piece is 'P' or 'p')
+        if (piece is 'P')
         {
             if (isCapture)
             {
@@ -33,12 +34,24 @@ public static class MoveUtility
             return $"{targetSquare}{isCheck}{isCheckmate}";
         }
 
-
+        var disambiguator = "";
+        if (isPossibleMoreMoves)
+        {
+            var posibleMove = GetPossibleStartingSquares(move.Piece, move.TargetSquare, board.Squares).First(s => s != move.StartSquare);
+            if (posibleMove % 8 != move.StartSquare % 8)
+            {
+                disambiguator = BoardUtility.NameFromIndex(move.StartSquare)[0].ToString();
+            }
+            else
+            {
+                disambiguator = BoardUtility.NameFromIndex(move.StartSquare)[1].ToString();
+            }
+        }
         if (isCapture)
         {
-            return $"{piece}{startSquare}x{targetSquare}{isCheck}{isCheckmate}";
+            return $"{piece}{disambiguator}x{targetSquare}{isCheck}{isCheckmate}";
         }
-        return $"{piece}{targetSquare}{isCheck}{isCheckmate}";
+        return $"{piece}{disambiguator}{targetSquare}{isCheck}{isCheckmate}";
     }
 
 	/// <summary>
