@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Chess.Core.Helpers;
@@ -7,9 +8,22 @@ public class PGNUtitlity
 {
     public static string CreatePGN(Board board)
     {
-        throw new NotImplementedException();
+        StringBuilder sb = new();
+        for (int i = 0; i < board.AllGameMoves.Count; i++)
+        {
+            if (i%2 == 0)
+            {
+                sb.Append($" {i/2 + 1}. ");
+                sb.Append(MoveUtility.GetSANFromMove(board.AllGameMoves[i]));
+                sb.Append(" ");
+                if (board.AllGameMoves[i+1] != null)
+                {
+                    sb.Append(MoveUtility.GetSANFromMove(board.AllGameMoves[i+1]));
+                }
+            }
+        }
+        return sb.ToString();
     }
-
     public static Board ParsePGN(string pgn)
     {
         Board board = new();
@@ -24,7 +38,7 @@ public class PGNUtitlity
                 if (newMove != null)
                 {
                     board.MakeMove(newMove);
-                    Console.WriteLine(board.ToString());
+                    //Console.WriteLine(board.ToString());
                 }
             }
         }

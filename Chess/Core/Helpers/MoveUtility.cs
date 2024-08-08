@@ -11,9 +11,34 @@ public static class MoveUtility
 
     public static string GetSANFromMove(Move move)
     {
-	    var s = $"Move from {move.StartSquare} to {move.TargetSquare}";
-        Console.WriteLine(s);
-        throw new NotImplementedException();
+        var piece = Piece.GetPieceSymbol(move.Piece);
+        var targetSquare = BoardUtility.NameFromIndex(move.TargetSquare);
+        var startSquare = BoardUtility.NameFromIndex(move.StartSquare);
+        var flag = move.Flag;
+        var isCapture = MoveFlag.CaptureFlag == flag;
+        var isCheck = move.IsCheck ? "+" : "";
+        var isCheckmate = move.IsCheckMate ? "#" : "";
+
+        if (flag == MoveFlag.CastleFlag)
+        {
+            return move.TargetSquare == 6 ? "O-O" : "O-O-O";
+        }
+
+        if (piece is 'P' or 'p')
+        {
+            if (isCapture)
+            {
+                return $"{startSquare[0]}x{targetSquare}{isCheck}{isCheckmate}";
+            }
+            return $"{targetSquare}{isCheck}{isCheckmate}";
+        }
+
+
+        if (isCapture)
+        {
+            return $"{piece}{startSquare}x{targetSquare}{isCheck}{isCheckmate}";
+        }
+        return $"{piece}{targetSquare}{isCheck}{isCheckmate}";
     }
 
 	/// <summary>
@@ -22,11 +47,13 @@ public static class MoveUtility
 	/// </summary>
     public static Move? GetMoveFromSAN(string san, Board.Board board)
     {
+        bool isCheck = san.Contains("+");
+        bool isCheckmate = san.Contains("#");
         san = san.Replace("+", "").Replace("#", ""); // Remove check and checkmate symbols
 
         if (san == "O-O" || san == "O-O-O")
         {
-            return CreateCastleMove(san, board.isWhiteToMove);
+            return CreateCastleMove(san, board.isWhiteToMove,isCheck,isCheckmate);
         }
 
         if (san == "0-1")
@@ -40,16 +67,17 @@ public static class MoveUtility
             return null;
         }
 
-        bool isCapture = san.Contains('x');
+        var isCapture = san.Contains('x');
         san = san.Replace("x", "");
 
-        byte targetSquare = BoardUtility.IndexFromName(san.Substring(san.Length - 2));
-        byte piece = board.isWhiteToMove ? Piece.WhitePawn : Piece.BlackPawn;
-        char pieceChar;
+        var targetSquare = BoardUtility.IndexFromName(san.Substring(san.Length - 2));
+        var piece = board.isWhiteToMove ? Piece.WhitePawn : Piece.BlackPawn;
+        var possibleMoreStartingMoves = false;
+        char disambiguator;
 
         if (char.IsUpper(san[0]))
         {
-            pieceChar = san[0];
+            var pieceChar = san[0];
             piece = Piece.GetPieceFromSymbol(pieceChar);
             piece = Piece.MakePiece(Piece.GetType(piece), board.isWhiteToMove);
             san = san.Substring(1);
@@ -58,13 +86,15 @@ public static class MoveUtility
         IEnumerable<byte> possibleStarts;
         if (san.Length == 3 && char.IsLetter(san[0])) // Disambiguating move (e.g., Nbd7)
         {
-            char disambiguator = san[0];
+            disambiguator = san[0];
+            possibleMoreStartingMoves = true;
             possibleStarts = GetPossibleStartingSquares(piece, targetSquare, board.Squares)
                 .Where(s => BoardUtility.GetFile(s) == disambiguator - 'a');
         }
         else if (san.Length == 3 && char.IsDigit(san[0])) // Disambiguating move (e.g., R1a3)
         {
-            char disambiguator = san[0];
+            disambiguator = san[0];
+            possibleMoreStartingMoves = true;
             possibleStarts = GetPossibleStartingSquares(piece, targetSquare, board.Squares)
                 .Where(s => BoardUtility.GetRank(s) == disambiguator - '1');
         }
@@ -91,16 +121,16 @@ public static class MoveUtility
             piece = Piece.GetPieceFromSymbol(san[san.Length - 1]);
         }
 
-        return new Move(startingSquare, targetSquare, flag, piece);
+        return new Move(startingSquare, targetSquare, flag, piece, possibleMoreStartingMoves, isCheck, isCheckmate);
     }
-    private static Move? CreateCastleMove(string san,bool isWhithToMove)
+    private static Move? CreateCastleMove(string san,bool isWhithToMove,bool isCheck,bool isCheckmate)
     {
         if (san == "O-O")
         {
             // Kingside castling
             return isWhithToMove
-                ? new Move(4, 6, MoveFlag.CastleFlag, Piece.WhiteKing)
-                : new Move(60, 62, MoveFlag.CastleFlag, Piece.BlackKing);
+                ? new Move(4, 6, MoveFlag.CastleFlag, Piece.WhiteKing,false, isCheck, isCheckmate)
+                : new Move(60, 62, MoveFlag.CastleFlag, Piece.BlackKing,false, isCheck, isCheckmate);
         }
         if (san == "O-O-O")
         {
