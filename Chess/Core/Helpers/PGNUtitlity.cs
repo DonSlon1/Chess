@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 namespace Chess.Core.Helpers;
 
 using Chess.Core.Board;
-public class PGNUtitlity
+public static class PgnUtitlity
 {
-    public static string CreatePGN(Board originalBoard)
+    public static string CreatePgn(Board originalBoard)
     {
         Move[] moves = originalBoard.AllGameMoves.ToArray();
         StringBuilder sb = new();
@@ -28,7 +28,7 @@ public class PGNUtitlity
         }
         return sb.ToString();
     }
-    public static Board ParsePGN(string pgn)
+    public static Board ParsePgn(string pgn)
     {
         Board board = new();
         string[] movesLines = Regex.Split(pgn, @"\d+\.");

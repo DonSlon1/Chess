@@ -28,10 +28,10 @@ public class Board
     public bool isWhiteToMove;
 
     // Castling rights
-    public readonly bool whiteCastleKingside;
-    public readonly bool whiteCastleQueenside;
-    public readonly bool blackCastleKingside;
-    public readonly bool blackCastleQueenside;
+    public bool WhiteCastleKingSide { get; set; }
+    public bool WhiteCastleQueenSide { get; set; }
+    public bool BlackCastleKingSide { get; set; }
+    public bool BlackCastleQueenSide { get; set; }
 
     // en passant square if avilable
     public readonly int? epFile;
@@ -55,15 +55,15 @@ public class Board
         _fen = fen;
         _squares = new byte[64];
         var posInfo = new FenUtility.PositionInfo(fen);
-        posInfo.squaers.CopyTo(Squares,0);
-        isWhiteToMove = posInfo.isWhiteToMove;
-        whiteCastleKingside = posInfo.whiteCastleKingside;
-        whiteCastleQueenside = posInfo.whiteCastleQueenside;
-        blackCastleKingside = posInfo.blackCastleKingside;
-        blackCastleQueenside = posInfo.blackCastleQueenside;
-        epFile = posInfo.epFile;
-        fityMovePlayCount = posInfo.fityMovePlayCount;
-        moveCount = posInfo.moveCount;
+        posInfo.Squares.CopyTo(Squares,0);
+        isWhiteToMove = posInfo.IsWhiteToMove;
+        WhiteCastleKingSide = posInfo.WhiteCastleKingSide;
+        WhiteCastleQueenSide = posInfo.WhiteCastleQueenSide;
+        BlackCastleKingSide = posInfo.BlackCastleKingSide;
+        BlackCastleQueenSide = posInfo.BlackCastleQueenSide;
+        epFile = posInfo.EpFile;
+        fityMovePlayCount = posInfo.FiftyMovePlayCount;
+        moveCount = posInfo.MoveCount;
 
     }
 
@@ -77,6 +77,14 @@ public class Board
         _squares[move.TargetSquare] = _squares[move.StartSquare];
         _squares[move.StartSquare] = (byte)PieceType.None;
         isWhiteToMove = !isWhiteToMove;
+        //check if king moved
+        if (move.Piece == Piece.WhiteKing)
+        {
+            //disable castling
+            WhiteCastleKingSide = false;
+            WhiteCastleQueenSide = false;
+        }
+        //check for check
         AllGameMoves.Add(move);
     }
 }

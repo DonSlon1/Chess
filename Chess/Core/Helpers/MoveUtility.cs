@@ -4,10 +4,10 @@ namespace Chess.Core.Helpers;
 
 public static class MoveUtility
 {
-    public static readonly sbyte[] KingMoves = { -9, -8, -7, -1, 1, 7, 8, 9 };
-    public static readonly sbyte[] KnightMoves = { -17, -15, -10, -6, 6, 10, 15, 17 };
-    public static readonly sbyte[] DiagonalMoves = { -9, -7, 7, 9 };
-    public static readonly sbyte[] StraightMoves = { -8, -1, 1, 8 };
+    private static readonly sbyte[] KingMoves = { -9, -8, -7, -1, 1, 7, 8, 9 };
+    private static readonly sbyte[] KnightMoves = { -17, -15, -10, -6, 6, 10, 15, 17 };
+    private static readonly sbyte[] DiagonalMoves = { -9, -7, 7, 9 };
+    private static readonly sbyte[] StraightMoves = { -8, -1, 1, 8 };
 
     public static string GetSANFromMove(Move move,Board.Board board)
     {
@@ -347,10 +347,15 @@ public static class MoveUtility
 
     private static bool IsClearStraightLine(byte startSquare, byte targetSquare, byte[] squares)
     {
-        int step = startSquare < targetSquare ?
-            (BoardUtility.GetRank(startSquare) == BoardUtility.GetRank(targetSquare) ? 1 : 8) :
-            (BoardUtility.GetRank(startSquare) == BoardUtility.GetRank(targetSquare) ? -1 : -8);
-
+        int step;
+        if (startSquare < targetSquare)
+        {
+            step = BoardUtility.GetRank(startSquare) == BoardUtility.GetRank(targetSquare) ? 1 : 8;
+        }
+        else
+        {
+            step = BoardUtility.GetRank(startSquare) == BoardUtility.GetRank(targetSquare) ? -1 : -8;
+        }
         int current = startSquare + step;
         int end = targetSquare;
 

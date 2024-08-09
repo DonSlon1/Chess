@@ -3,10 +3,10 @@ using Chess.Core.Board;
 
 namespace Chess.Core.Helpers;
 
-public class BoardUtility
+public abstract class BoardUtility
 {
-	public const string fileNames = "abcdefgh";
-	public const string rankNames = "12345678";
+	private const string FileNames = "abcdefgh";
+	private const string RankNames = "12345678";
 
 	public static byte IndexFromName(string name)
 	{
@@ -14,10 +14,10 @@ public class BoardUtility
 		name = name.ToLower();
 		var fileName = name[0];
 		var rankName = name[1];
-		if (!fileNames.Contains(fileName)) throw new ArgumentException("Invalid file name");
-		if (!rankNames.Contains(rankName)) throw new ArgumentException("Invalid rank name");
+		if (!FileNames.Contains(fileName)) throw new ArgumentException("Invalid file name");
+		if (!RankNames.Contains(rankName)) throw new ArgumentException("Invalid rank name");
 
-		return (byte)(rankNames.IndexOf(rankName) * 8 + fileNames.IndexOf(fileName));
+		return (byte)(RankNames.IndexOf(rankName) * 8 + FileNames.IndexOf(fileName));
 	}
 
 	public static string CreateDiagram(Board.Board board, bool blackAtTop = true, bool includeFen = true, bool includeZobristKey = true)
@@ -84,11 +84,11 @@ public class BoardUtility
 	public static string NameFromIndex(int? index)
 	{
 		if (index == null) return "-";
-		return $"{fileNames[index.Value % 8]}{rankNames[index.Value / 8]}";
+		return $"{FileNames[index.Value % 8]}{RankNames[index.Value / 8]}";
 	}
 	public static string NameFromCoord(int fileIndex, int rankIndex)
 	{
-		return $"{fileNames[fileIndex]}{rankNames[rankIndex]}";
+		return $"{FileNames[fileIndex]}{RankNames[rankIndex]}";
 	}
 	public static byte GetRank(byte squareIndex)
 	{

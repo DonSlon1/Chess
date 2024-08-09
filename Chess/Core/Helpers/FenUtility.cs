@@ -5,28 +5,30 @@ using Chess.Core.Board;
 namespace Chess.Core.Helpers;
 using Chess.Core.Board;
 
-public class FenUtility
+public static class FenUtility
 {
     public readonly struct PositionInfo
     {
-        public readonly string fen;
-        public readonly byte[] squaers;
-        public readonly bool isWhiteToMove;
+        public string Fen { get; private init; }
+        public byte[] Squares { get; private init; }
+        public readonly bool IsWhiteToMove;
 
         // Castling rights
-        public readonly bool whiteCastleKingside;
-        public readonly bool whiteCastleQueenside;
-        public readonly bool blackCastleKingside;
-        public readonly bool blackCastleQueenside;
+        public bool WhiteCastleKingSide { get; private init; }
+        public bool WhiteCastleQueenSide { get; private init; }
+        public bool BlackCastleKingSide { get; private init; }
+        public bool BlackCastleQueenSide { get; private init; }
 
         // en passant square if avilable
-        public readonly int? epFile;
-        public readonly int fityMovePlayCount;
-        public readonly int moveCount;
+        public int? EpFile { get; private init; }
+        private readonly int _fiftyMovePlayCount;
+        public int FiftyMovePlayCount => _fiftyMovePlayCount;
+        private readonly int _moveCount;
+        public int MoveCount => _moveCount;
 
         public PositionInfo(string fen)
         {
-            this.fen = fen;
+            Fen = fen;
             byte[] squarePieces = new byte[64];
             string[] sections = fen.Split(' ');
 
@@ -51,22 +53,22 @@ public class FenUtility
                 file++;
             }
 
-            squaers = squarePieces;
-            isWhiteToMove = sections[1] == "w";
+            Squares = squarePieces;
+            IsWhiteToMove = sections[1] == "w";
             var castlingRights = sections[2];
-            whiteCastleKingside = castlingRights.Contains('K');
-            whiteCastleQueenside = castlingRights.Contains('Q');
+            WhiteCastleKingSide = castlingRights.Contains('K');
+            WhiteCastleQueenSide = castlingRights.Contains('Q');
 
-            blackCastleKingside = castlingRights.Contains('k');
-            blackCastleQueenside = castlingRights.Contains('q');
+            BlackCastleKingSide = castlingRights.Contains('k');
+            BlackCastleQueenSide = castlingRights.Contains('q');
 
             if (!sections[3].Contains('-'))
             {
-                epFile = BoardUtility.IndexFromName(sections[3]);
+                EpFile = BoardUtility.IndexFromName(sections[3]);
             }
 
-            int.TryParse(sections[4], out fityMovePlayCount);
-            int.TryParse(sections[5], out moveCount);
+            int.TryParse(sections[4], out _fiftyMovePlayCount);
+            int.TryParse(sections[5], out _moveCount);
         }
     }
 
@@ -79,10 +81,10 @@ public class FenUtility
 
         // Castling rights
         string castlingRights = string.Concat(
-            board.whiteCastleKingside ? "K" : "",
-            board.whiteCastleQueenside ? "Q" : "",
-            board.blackCastleKingside ? "k" : "",
-            board.blackCastleQueenside ? "q" : ""
+            board.WhiteCastleKingSide ? "K" : "",
+            board.WhiteCastleQueenSide ? "Q" : "",
+            board.BlackCastleKingSide ? "k" : "",
+            board.BlackCastleQueenSide ? "q" : ""
         );
         fen.Append(castlingRights.Length > 0 ? castlingRights : "-");
 
@@ -93,11 +95,11 @@ public class FenUtility
 
     private static string CurrentFenFields(byte[] squares)
     {
-        var fen = new StringBuilder();
-        for (int i = 8 - 1; i >= 0; i--)
+        StringBuilder fen = new StringBuilder();
+        for (var i = 8 - 1; i >= 0; i--)
         {
-            int empty = 0;
-            for (int j = 0; j < 8; j++)
+            var empty = 0;
+            for (var j = 0; j < 8; j++)
             {
                 if (squares[i * 8 + j] == (int) PieceType.None)
                 {
